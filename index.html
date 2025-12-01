@@ -11,7 +11,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Lichte grijze achtergrond */
+            /* De achtergrond wordt nu ingesteld via Tailwind class op de body tag */
         }
         /* Stijl voor de quiz knoppen */
         .option-button {
@@ -28,10 +28,12 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<!-- De body achtergrond is nu een zeer licht roze tint (bg-rose-50) -->
+<body class="min-h-screen flex items-center justify-center p-4 bg-rose-50">
 
     <!-- Quiz Container (Wrapper) -->
-    <div id="quiz-container" class="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl border border-rose-100">
+    <!-- Sterkere roze border en een roze schaduw voor een intenser effect -->
+    <div id="quiz-container" class="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl shadow-rose-400/50 border border-rose-300">
 
         <!-- LOGIN AREA (Eerste scherm) -->
         <div id="login-area" class="text-center">
@@ -73,7 +75,8 @@
             </div>
 
             <!-- Feedback en Score (verborgen tot nodig) -->
-            <div id="feedback-area" class="text-center text-lg font-bold h-6 mb-4"></div>
+            <!-- De feedback-area heeft nu een groter lettertype en geen vaste hoogte, zodat de boodschap past -->
+            <div id="feedback-area" class="text-center text-2xl font-bold mb-4"></div>
 
             <!-- Status en Resultaten (onderaan) -->
             <p id="status-text" class="text-sm text-center text-gray-500 mt-6"></p>
@@ -91,7 +94,7 @@
     <!-- JavaScript Logica -->
     <script>
         // Deel 1: Configuratie en Data
-        // Het wachtwoord wordt geconverteerd naar kleine letters, waardoor de login niet hoofdlettergevoelig is.
+        // Het wachtwoord wordt geconverteerd naar kleine letters voor de niet-hoofdlettergevoelige check
         const CORRECT_PASSWORD = "studneten"; 
         
         const quizData = [
@@ -137,13 +140,15 @@
             },
             {
                 question: "Welke groep vertoont soms meer machogedrag dan gewenst?",
-                options: ["De studenten", "De docenten", "Beide", "Niemand natuurlijk, we zijn allemaal gelijkwaardig"],
-                answer: "Beide"
+                options: ["De studenten", "De docenten", "Beide", "Geen van beide"],
+                // HIER AANGEPAST: Het juiste antwoord is nu "Beide" (Optie C), terwijl "Geen van beide" (Optie D) blijft staan als foute optie.
+                answer: "Beide" 
             },
             {
                 question: "Welke quote past het beste bij Monique?",
                 options: ["“Winnen is belangrijker dan meedoen.”", "“Doelen zijn er niet om te dromen, maar om af te vinken.”", "“Rustig blijven, ook als Ajax weer verliest.”", "“Altijd net iets beter willen doen dan gisteren – en meestal lukt dat dat ook.”"],
-                answer: "“Altijd net iets beter willen doen dan gisteren – en meestal lukt dat dat ook.”"
+                // Correct antwoord voor Vraag 10 is A
+                answer: "“Winnen is belangrijker dan meedoen.”" 
             }
         ];
 
@@ -280,27 +285,30 @@
             document.getElementById('question-area').classList.add('hidden');
             statusText.textContent = ''; 
             
-            const percentage = Math.round((score / quizData.length) * 100);
+            const totalQuestions = quizData.length; // Haal het totaal aantal vragen op
+            const percentage = Math.round((score / totalQuestions) * 100);
             
-            let message = '';
+            let finalMessage = '';
             
             // Controleer of de quiz foutloos is afgerond
-            if (score === quizData.length) {
-                 // Bericht voor foutloze score met "openen"
-                 message = "FANTASTISCH! Je hebt de quiz FOUTLOOS afgerond! Je hebt de kado's verdiend en mag ze nu **openen**! 🏆🎉";
+            if (score === totalQuestions) {
+                 // **GEFIXTE boodschap voor foutloze score**
+                 finalMessage = "GEFELICITEERD, pak je kadootjes uit! 🏆🎉";
                  feedbackArea.classList.remove('text-red-600', 'text-green-600');
                  feedbackArea.classList.add('text-rose-600');
-            }
-            else if (percentage >= 75) {
-                message = "Heel goed gedaan! Je hebt een sterke kennis. 💪";
-            } else if (percentage >= 50) {
-                message = "Niet slecht. Een solide basis. Blijf oefenen! 👍";
             } else {
-                message = "Je kunt nog wat oefening gebruiken. Geen zorgen, de volgende keer beter! 😊";
+                 // **GEFIXTE boodschap voor een of meer fouten**
+                 finalMessage = "Helaas, ik had beter van je verwacht, gelukkig heb je nog 234982348 pogingen over, succes! De kado's blijven gesloten. 😔";
+                 feedbackArea.classList.remove('text-rose-600', 'text-green-600');
+                 feedbackArea.classList.add('text-red-600'); 
             }
             
-            questionText.textContent = `Quiz voltooid! Je score is ${score} van de ${quizData.length} (${percentage}%).`;
+            // 1. Toon de score/samenvatting in de vraagtekst
+            questionText.textContent = `Quiz voltooid! Je score is ${score} van de ${totalQuestions} (${percentage}%).`;
             
+            // 2. Toon de persoonlijke boodschap (GEFIXED!)
+            feedbackArea.textContent = finalMessage; 
+
             // Toon de herstartknop
             restartContainer.classList.remove('hidden');
         }
